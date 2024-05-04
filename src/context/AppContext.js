@@ -1,32 +1,56 @@
-// src/context/AppContext.js
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-    const [networkProvider, setNetworkProvider] = useState(null);
     const [currentAccount, setCurrentAccount] = useState(null);
+    const [networkProvider, setNetworkProvider] = useState(null);
 
     useEffect(() => {
-        async function loadProvider() {
-            if (window.ethereum) {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const accounts = await provider.send("eth_requestAccounts", []);
-                const account = accounts[0];
-                setNetworkProvider(provider);
-                setCurrentAccount(account);
-            } else {
-                console.log("Ethereum object not found, install MetaMask.");
-                alert("Please install MetaMask!");
-            }
-        }
+        const { ethereum } = window;
 
-        loadProvider();
+        const checkIfWalletIsConnected = async () => {
+            if (!ethereum) {
+                console.log("Make sure you have MetaMask!");
+                return;
+            }
+
+            const accounts = await ethereum.request({ method: 'eth_accounts' });
+            if (accounts.length > 0) {
+                setCurrentAccount(accounts[0]);
+            }
+
+            const provider = new ethers.providers.Web3Provider(ethereum);
+            setNetworkProvider(provider);
+        };
+
+        checkIfWalletIsConnected();
+
+        const handleAccountsChanged = (accounts) => {
+            if (accounts.length === 0) {
+                console.log("Please connect to MetaMask.");
+            } else {
+                setCurrentAccount(accounts[0]);
+            }
+        };
+
+        const handleChainChanged = (_chainId) => {
+            // Reload the page to reset the DApp state with the new chain's data
+            window.location.reload();
+        };
+
+        ethereum.on('accountsChanged', handleAccountsChanged);
+        ethereum.on('chainChanged', handleChainChanged);
+
+        return () => {
+            ethereum.removeListener('accountsChanged', handleAccountsChanged);
+            ethereum.removeListener('chainChanged', handleChainChanged);
+        };
     }, []);
 
     return (
-        <AppContext.Provider value={{ networkProvider, currentAccount }}>
+        <AppContext.Provider value={{ currentAccount, networkProvider }}>
             {children}
         </AppContext.Provider>
     );
