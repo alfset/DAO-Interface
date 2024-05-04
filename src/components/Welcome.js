@@ -84,7 +84,7 @@ const HomePage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <DescriptionCard 
                     title="Advanced Blockchain Integration"
-                    content="Oracle DAO Controlized integrates cutting-edge blockchain technology to ensure seamless interoperability between EVM and WASM protocols, enhancing the efficiency and scalability of decentralized applications."
+                    content="Oracle DAO Controlized integrates cutting-edge blockchain technology to ensure seamless interoperability between EVM and WASM protocols contract, enhancing the efficiency and scalability of decentralized applications."
                 />
                 <DescriptionCard 
                     title="Decentralized Governance"
@@ -92,7 +92,7 @@ const HomePage = () => {
                 />
                 <DescriptionCard 
                     title="Support for Multiple Chains"
-                    content="We support a variety of blockchain platforms including Ethereum and Polkadot, ensuring that developers have the flexibility to work with their preferred technologies."
+                    content="We support a variety of blockchain platforms including EVM layer1, layer2 and manymore ensuring that developers have the flexibility to work with their preferred technologies."
                 />
                 <DescriptionCard 
                     title="Oracle Services"
