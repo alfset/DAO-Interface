@@ -1,11 +1,11 @@
 export const fetchTotalStaked = async () => {
     // Replace with actual contract call
-    return "1,0000,000,0000 $";
+    return "100,000$";
 };
 
 export const fetchTotalMembers = async () => {
     // Replace with actual contract call
-    return "98 Members";
+    return "1M $";
 };
 
 export const fetchChainSupported = async () => {

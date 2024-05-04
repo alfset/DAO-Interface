@@ -2,18 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { AppContext } from '../context/AppContext';
 import OracleABI from '../utils/abis/Oralce_ABI.json';
+import { contractAddresses, tickers } from '../utils/chain-contants'
 
-const contractAddresses = {
-    '61': '0x02f3A4bB77fF782A1F9ADeBF392D36390b10fd47',   // BSC Testnet
-    '1ba5': '0xE62a3277429B9F26C466D31157D50CaE97561e7C', // Planq Testnet
-    '8274f': '0x730de67Bf353F8d9B2648Cf0af9681b265f06b3A' // Scroll Testnet
-  };
-  
-  const tickers = {
-    '61': 'TBNB',     
-    '1ba5': 'TPLANQ',
-    '8274f': 'ETH',
-  };
   
   const DAO = () => {
       const { currentAccount, networkProvider } = useContext(AppContext);
@@ -25,7 +15,9 @@ const contractAddresses = {
       const [withdrawAmount, setWithdrawAmount] = useState('');
       const [totalProposalFees, setTotalProposalFees] = useState('0');
       const [totalRequestFees, setTotalRequestFees] = useState('0');
-      const [ticker, setTicker] = useState(''); // Initialize without default
+      const [ticker, setTicker] = useState('');
+      const [revenue, setRevenue] = useState('0');
+
   
       useEffect(() => {
           if (networkProvider) {
@@ -41,7 +33,7 @@ const contractAddresses = {
                       setDaoContract(contract);
                       fetchStakedAmount(contract, currentAccount);
                       fetchFees(contract);
-                      fetchMembers(contract); 
+                      fetchMembers(contract);
                   }
               });
           }
@@ -74,7 +66,7 @@ const contractAddresses = {
       };
 
       const fetchMembers = async (contract) => {
-        const memberCount = 100; // Assuming a max of 100 members for iteration
+        const memberCount = 100;
         const memberDetails = []
         for (let i = 0; i < memberCount; i++) {
             try {
@@ -87,6 +79,8 @@ const contractAddresses = {
             }
         }
         setMembers(memberDetails);
+        calculateVotingPower(memberDetails);
+
     };
   
       const joinDAO = async () => {
@@ -102,6 +96,14 @@ const contractAddresses = {
               alert('Error joining DAO');
           }
       };
+      const calculateVotingPower = (memberDetails) => {
+        const totalStakes = memberDetails.reduce((acc, member) => acc + parseFloat(member.stake), 0);
+        const updatedMembers = memberDetails.map(member => ({
+            ...member,
+            votingPower: ((parseFloat(member.stake) / totalStakes) * 100).toFixed(2) + '%'
+        }));
+        setMembers(updatedMembers);
+    };
   
       const addStake = async () => {
           if (!daoContract || !additionalStake) return;
@@ -136,9 +138,9 @@ const contractAddresses = {
     const inputStyle = {
         flex: '1',
         marginRight: '10px',
-        padding: '10px',
         borderRadius: '8px',
-        border: '1px solid #ccc'
+        border: '1px solid #ccc',
+        margin: '10px',
     };
 
     const buttonStyle = {
@@ -158,7 +160,7 @@ const contractAddresses = {
         textAlign: 'center',
         marginBottom: '10px',
         flex: '1 1 calc(33.333% - 20px)',
-        margin: '10px',
+        margin: '10px 20px',
     };
 
     const headerStyle = {
@@ -166,7 +168,8 @@ const contractAddresses = {
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: '20px',
-        color: 'white'
+        color: 'white',
+        margin: '0 0 12px 0'
     };
     
     
@@ -174,25 +177,22 @@ const contractAddresses = {
     return (
         <div>
             <div style={headerStyle}>
-                <h1 style={{ color: 'white' }}>Manage and contoled you DAO joined Account</h1>
                 <button onClick={joinDAO} style={buttonStyle}>Join DAO</button>
             </div>
-            <div style={{
-                display: 'flex',
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                justifyContent: 'space-around',
-            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div style={cardStyle}>
                     <p>Staked Amount: {stakedAmount} {ticker}</p>
                 </div>
                 <div style={cardStyle}>
-                    <p>Total Proposal Fees Collected: {totalProposalFees} {ticker}</p>
+                    <p>Proposal Fees Collected: {totalProposalFees} {ticker}</p>
                 </div>
                 <div style={cardStyle}>
-                    <p>Total Request Fees Collected: {totalRequestFees} {ticker}</p>
+                    <p>Request Fees Collected: {totalRequestFees} {ticker}</p>
                 </div>
-            </div>
+                <div style={cardStyle}>
+                    <p>Total Reward Distributed: 15M {ticker}</p>
+                </div>
+                </div>  
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <div style={cardStyle}>
                 <input
@@ -215,9 +215,9 @@ const contractAddresses = {
                 <button onClick={withdrawStake} style={buttonStyle}>Withdraw Stake</button>
             </div>
             </div>
-            <div>
-            <h1 style={{ color: 'white' }}>DAO Members</h1>
-            </div>
+            <div style={cardStyle}>
+                    <h2>DAO Members</h2>
+                </div>
             <div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div style={cardStyle}>
@@ -226,22 +226,32 @@ const contractAddresses = {
                 <div style={cardStyle}>
                     <h2>Staked Amounts</h2>
                 </div>
+                <div style={cardStyle}>
+                    <h2>Revenue Sharing</h2>
+                </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div style={cardStyle}>
+            <div style={{cardStyle, width: '100%', marginTop: '10pv'}}>
                     {members.map((member, index) => (
                         <div key={index} style={cardStyle}>
                             <p>{member.address}</p>
                         </div>
                     ))}
                 </div>
-                <div style={cardStyle}>
+                <div style={{cardStyle, width: '100%', marginTop: '10pv'}}>
                     {members.map((member, index) => (
                         <div key={index} style={cardStyle}>
                             <p>{member.stake} {ticker}</p>
                         </div>
                     ))}
                 </div>
+                <div style={{cardStyle, width: '100%', marginTop: '10pv'}}>
+                {members.map((member, index) => (
+                    <div key={index} style={cardStyle}>
+                        <p>{member.votingPower}</p>
+                    </div>
+                ))}
+            </div>
             </div>
         </div>
         </div>
