@@ -8,25 +8,25 @@ export const AppProvider = ({ children }) => {
     const [networkProvider, setNetworkProvider] = useState(null);
 
     useEffect(() => {
-        const { ethereum } = window;
-
+        const ethereum = window.ethereum;
+    
+        if (!ethereum) {
+            console.log("Make sure you have MetaMask!");
+            return;
+        }
+    
         const checkIfWalletIsConnected = async () => {
-            if (!ethereum) {
-                console.log("Make sure you have MetaMask!");
-                return;
-            }
-
             const accounts = await ethereum.request({ method: 'eth_accounts' });
             if (accounts.length > 0) {
                 setCurrentAccount(accounts[0]);
             }
-
+    
             const provider = new ethers.providers.Web3Provider(ethereum);
             setNetworkProvider(provider);
         };
-
+    
         checkIfWalletIsConnected();
-
+    
         const handleAccountsChanged = (accounts) => {
             if (accounts.length === 0) {
                 console.log("Please connect to MetaMask.");
@@ -34,21 +34,25 @@ export const AppProvider = ({ children }) => {
                 setCurrentAccount(accounts[0]);
             }
         };
-
+    
         const handleChainChanged = (_chainId) => {
             // Reload the page to reset the DApp state with the new chain's data
             window.location.reload();
         };
-
-        ethereum.on('accountsChanged', handleAccountsChanged);
-        ethereum.on('chainChanged', handleChainChanged);
-
+    
+        if (ethereum.on) {
+            ethereum.on('accountsChanged', handleAccountsChanged);
+            ethereum.on('chainChanged', handleChainChanged);
+        }
+    
         return () => {
-            ethereum.removeListener('accountsChanged', handleAccountsChanged);
-            ethereum.removeListener('chainChanged', handleChainChanged);
+            if (ethereum.removeListener) {
+                ethereum.removeListener('accountsChanged', handleAccountsChanged);
+                ethereum.removeListener('chainChanged', handleChainChanged);
+            }
         };
     }, []);
-
+    
     return (
         <AppContext.Provider value={{ currentAccount, networkProvider }}>
             {children}
