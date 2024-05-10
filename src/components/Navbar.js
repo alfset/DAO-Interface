@@ -8,9 +8,9 @@ import { AppContext } from "../context/AppContext";
 // Define chain information for switching
 const networks = {
   Atlas: {
-    chainId: '0x1ba5', // Binance Smart Chain Mainnet
-    chainName: 'Planq Testnet',
-    rpcUrls: ['https://evm-rpc-atlas.planq.network/'],
+    chainId: '0x1b9e', // Binance Smart Chain Mainnet
+    chainName: 'Planq',
+    rpcUrls: ['https://planq-rpc.nodies.app'],
   },
   scroll: {
     chainId: '0x8274f', // Example, replace with actual
@@ -78,7 +78,7 @@ const Navbar = () => {
           <Link to="/Governance">Governance</Link>
         </li>
         <select onChange={(e) => switchNetwork(e.target.value)} className="bg-[#2952e3] text-white py-2 px-4 rounded-lg cursor-pointer hover:bg-[#2546bd]">
-          <option value="Atlas">Planq Testnet</option>
+          <option value="Atlas">Planq</option>
           <option value="scroll">Scroll Sepolia</option>
           <option value="testBSC">Testnet BSC</option>
         </select>

@@ -20,16 +20,6 @@ const HomePage = () => {
     }, []);
     return (
         <div className="home-page-container mx-auto max-w-7xl p-8">
-            <div className="introduction text-white">
-                <h2 className="text-2xl font-bold">Latest Price Update</h2>
-            </div>
-            <div className="stats-cards grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-8">
-            {Object.entries(priceUpdates).map(([ticker, updates]) => (
-                updates.map((update, index) => (
-                    <Card key={`${ticker}-${index}`} title={`Chain ${ticker} `} value={`ID: ${update.symbol || update.priceId}, Price: ${update.price} $`} />
-                ))
-            ))}
-            </div>
             <div className="stats-cards grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
                 <Card title="Total Staked" value={totalStaked} />
                 <Card title="Chains Supported" value={totalChains} />
