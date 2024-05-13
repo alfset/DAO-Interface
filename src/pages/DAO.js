@@ -16,6 +16,7 @@ import { contractAddresses, tickers } from '../utils/chain-contants'
       const [totalProposalFees, setTotalProposalFees] = useState('0');
       const [totalRequestFees, setTotalRequestFees] = useState('0');
       const [ticker, setTicker] = useState('');
+      const [responsiveCardStyle, setResponsiveCardStyle] = useState({});
       const [revenue, setRevenue] = useState('0');
 
   
@@ -39,7 +40,6 @@ import { contractAddresses, tickers } from '../utils/chain-contants'
           }
       }, [networkProvider, currentAccount]);
   
-      // Debugging chainId and ticker
       useEffect(() => {
           console.log('Chain ID:', chainId);
           console.log('Ticker:', ticker);
@@ -86,7 +86,7 @@ import { contractAddresses, tickers } from '../utils/chain-contants'
       const joinDAO = async () => {
           if (!daoContract) return;
           try {
-              const txResponse = await daoContract.joinDAO({ value: ethers.utils.parseEther("10") });
+              const txResponse = await daoContract.joinDAO({ value: ethers.utils.parseEther("1") });
               await txResponse.wait();
               alert('Successfully joined DAO!');
               fetchStakedAmount(daoContract, currentAccount);
@@ -172,29 +172,68 @@ import { contractAddresses, tickers } from '../utils/chain-contants'
         margin: '0 0 12px 0'
     };
     
-    
+    const flexContainerStyle = {
+        display: 'flex',
+        flexWrap: 'wrap', // Allow items to wrap
+        justifyContent: 'space-between'
+    };
+
+    // Modified card style for responsiveness
+    useEffect(() => {
+        const updateStyles = () => {
+            if (window.innerWidth < 768) {
+                setResponsiveCardStyle({
+                    backgroundColor: '#1a202c',
+                    color: 'white',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    marginBottom: '10px',
+                    flex: '1 1 100%',
+                    margin: '10px',
+                    maxWidth: '100%'
+                });
+            } else {
+                setResponsiveCardStyle({
+                    backgroundColor: '#1a202c',
+                    color: 'white',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    marginBottom: '10px',
+                    flex: '1 1 calc(33.333% - 20px)',
+                    margin: '10px 20px',
+                    maxWidth: 'calc(33.333% - 20px)'
+                });
+            }
+        };
+
+        updateStyles();
+        window.addEventListener('resize', updateStyles);
+        return () => window.removeEventListener('resize', updateStyles);
+    }, []);
 
     return (
         <div>
             <div style={headerStyle}>
                 <button onClick={joinDAO} style={buttonStyle}>Join DAO</button>
             </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div style={cardStyle}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                <div style={responsiveCardStyle}>
                     <p>Staked Amount: {stakedAmount} {ticker}</p>
                 </div>
-                <div style={cardStyle}>
+                <div style={responsiveCardStyle}>
                     <p>Proposal Fees Collected: {totalProposalFees} {ticker}</p>
                 </div>
-                <div style={cardStyle}>
+                <div style={responsiveCardStyle}>
                     <p>Request Fees Collected: {totalRequestFees} {ticker}</p>
                 </div>
-                <div style={cardStyle}>
+                <div style={responsiveCardStyle}>
                     <p>Total Reward Distributed: 15M {ticker}</p>
                 </div>
                 </div>  
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div style={cardStyle}>
+            <div style={{ display: 'flex' }}>
+            <div style={responsiveCardStyle}>
                 <input
                     type="text"
                     value={additionalStake}
@@ -204,7 +243,7 @@ import { contractAddresses, tickers } from '../utils/chain-contants'
                 />
                 <button onClick={addStake} style={buttonStyle}>Add Stake</button>
             </div>
-            <div style={cardStyle}>
+            <div style={responsiveCardStyle}>
                 <input
                     type="text"
                     value={withdrawAmount}
@@ -215,39 +254,39 @@ import { contractAddresses, tickers } from '../utils/chain-contants'
                 <button onClick={withdrawStake} style={buttonStyle}>Withdraw Stake</button>
             </div>
             </div>
-            <div style={cardStyle}>
+            <div style={responsiveCardStyle}>
                     <h2>DAO Members</h2>
                 </div>
             <div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div style={cardStyle}>
+                <div style={responsiveCardStyle}>
                     <h2>Address</h2>
                 </div>
-                <div style={cardStyle}>
+                <div style={responsiveCardStyle}>
                     <h2>Staked Amounts</h2>
                 </div>
-                <div style={cardStyle}>
+                <div style={responsiveCardStyle}>
                     <h2>Revenue Sharing</h2>
                 </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <div style={{cardStyle, width: '100%', marginTop: '10pv'}}>
                     {members.map((member, index) => (
-                        <div key={index} style={cardStyle}>
+                        <div key={index} style={responsiveCardStyle}>
                             <p>{member.address}</p>
                         </div>
                     ))}
                 </div>
-                <div style={{cardStyle, width: '100%', marginTop: '10pv'}}>
+                <div style={{responsiveCardStyle}}>
                     {members.map((member, index) => (
-                        <div key={index} style={cardStyle}>
+                        <div key={index} style={responsiveCardStyle}>
                             <p>{member.stake} {ticker}</p>
                         </div>
                     ))}
                 </div>
-                <div style={{cardStyle, width: '100%', marginTop: '10pv'}}>
+                <div style={{responsiveCardStyle, width: '100%', marginTop: '10pv'}}>
                 {members.map((member, index) => (
-                    <div key={index} style={cardStyle}>
+                    <div key={index} style={responsiveCardStyle}>
                         <p>{member.votingPower}</p>
                     </div>
                 ))}
